@@ -2,17 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IGameManager : MonoBehaviour
+public interface IGameManager
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    ManagerStatus status { get; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    void Startup(NetworkService service);
 }
