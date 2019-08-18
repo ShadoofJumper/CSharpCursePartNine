@@ -11,8 +11,6 @@ public class NetworkService
 
     private bool IsResponseValid(WWW www)
     {
-        Debug.Log(www.text);
-        Debug.Log(www.error);
         if (!string.IsNullOrEmpty(www.error))
         {
             Debug.Log("Bad connect");
