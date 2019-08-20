@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Xml;
-using System.Xml.Linq;
-using System.Linq;
-using System.IO;
-using System.Text;
+using MiniJSON;
 
 public class WeatherManager : MonoBehaviour, IGameManager
 {
@@ -20,44 +17,44 @@ public class WeatherManager : MonoBehaviour, IGameManager
         Debug.Log("Wheather manager startup...");
 
         _network = service;
-        StartCoroutine(_network.GetWeatherXML(OnXMLDataLoaded));
+        StartCoroutine(_network.GetWeatherJSON(OnJSONDataLoaded));
         status = ManagerStatus.Initializing;
     }
 
+    public void OnJSONDataLoaded(string data)
+    {
+        Dictionary<string, object> dict;
+        dict = Json.Deserialize(data) as Dictionary<string, object>;
+
+
+        Dictionary<string, object> clouds  = (
+            Dictionary<string, object>) dict["clouds"];
+            cloudValue = (long)clouds["all"] / 100f;
+            Debug.Log("Value: "+ cloudValue);
+
+
+        Messenger.Broadcast(GameEvent.WEATHER_UPDATED);
+        status = ManagerStatus.Started;
+
+    }
+
+
+
     public void OnXMLDataLoaded(string data)
     {
-        Debug.Log(data);
-        string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
-        if (data.StartsWith(_byteOrderMarkUtf8))
-        {
-            Debug.Log("Yes1");
-            data = data.Remove(0, _byteOrderMarkUtf8.Length);
-
-        }
 
         XmlDocument doc = new XmlDocument(); // create class example
-
-        Debug.Log(data);
-
         doc.LoadXml(data); // pars a xml code
+        XmlNode root = doc.DocumentElement;
 
+        XmlNode node = root.SelectSingleNode("clouds");
+        string value = node.Attributes["value"].Value;
+        cloudValue = Convert.ToInt32(value) / 100f;
 
-       // XmlNode root = doc.DocumentElement;
-
-
-        //doc.LoadXml(data);
-
-
-
-        // XmlNode root = doc.DocumentElement;
-
-        // XmlNode node = root.SelectSingleNode("clouds");
-        //string value = node.Attributes["value"].Value;
-        //cloudValue = Convert.ToInt32(value) / 100f;
-
-        //Debug.Log("Value: "+cloudValue);
-
-        MessengerInternal.DEFAULT_MODE = MessengerMode.DONT_REQUIRE_LISTENER;
+        Debug.Log("Value: "+cloudValue);
+        //--
+       // MessengerInternal.DEFAULT_MODE = MessengerMode.DONT_REQUIRE_LISTENER;
+        //--
         Messenger.Broadcast(GameEvent.WEATHER_UPDATED);
         status = ManagerStatus.Started;
     }

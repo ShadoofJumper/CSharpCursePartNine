@@ -8,7 +8,16 @@ public class WheatherController : MonoBehaviour
     [SerializeField] private Light sun;
 
     private float _fullIntensity;
-    private float _cloudeValue = 0f;
+
+    void Awake()
+    {
+        Messenger.AddListener(GameEvent.WEATHER_UPDATED, OnWeatherUpdate);
+    }
+
+    void OnDestroy()
+    {
+        Messenger.RemoveListener(GameEvent.WEATHER_UPDATED, OnWeatherUpdate);
+    }
 
     void Start()
     {
@@ -17,19 +26,19 @@ public class WheatherController : MonoBehaviour
     }
 
 
-    void Update()
+    private void OnWeatherUpdate()
     {
-        SetOvercast(_cloudeValue);
-        _cloudeValue += .005f;
+        SetOvercast(Managers.Weather.cloudValue);
     }
+
 
     private void SetOvercast(float value)
     {
-        if (value <= 1)
-        {
+        //if (value <= 1)
+        //{
             sky.SetFloat("_Blend", value);
             sun.intensity = _fullIntensity - (_fullIntensity * value);
-        }
+       // }
 
     }
 }
