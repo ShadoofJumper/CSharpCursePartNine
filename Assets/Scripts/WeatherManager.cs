@@ -38,7 +38,15 @@ public class WeatherManager : MonoBehaviour, IGameManager
 
     }
 
+    public void LogWheather(string name)
+    {
+        StartCoroutine(_network.LogWeather(name, cloudValue, OnLogged));
+    }
 
+    public void OnLogged(string response)
+    {
+        Debug.Log(response);
+    }
 
     public void OnXMLDataLoaded(string data)
     {

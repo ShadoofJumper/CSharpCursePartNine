@@ -22,7 +22,12 @@ public class ImageManager : MonoBehaviour, IGameManager
     {
         if (_webImage == null)
         {
-            StartCoroutine(_network.DownloadImage(callback));
+            StartCoroutine(_network.DownloadImage((Texture2D image) =>
+                {
+                    _webImage = image;
+                    callback(_webImage);
+                }
+            ));
         }
         else
         {
@@ -31,3 +36,5 @@ public class ImageManager : MonoBehaviour, IGameManager
     }
 
 }
+
+
